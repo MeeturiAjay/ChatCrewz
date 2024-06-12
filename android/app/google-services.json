@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "559144906386",
+    "project_id": "fine-web-383717",
+    "storage_bucket": "fine-web-383717.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559144906386:android:6a78904fd07b82fc17804b",
+        "android_client_info": {
+          "package_name": "com.example.firebasechatappflutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCipYoHlR3GQ4ElkLCvZZygYYttzgYbFko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559144906386:android:8f3376d4cf042c0817804b",
+        "android_client_info": {
+          "package_name": "com.example.firebasechatappltst"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCipYoHlR3GQ4ElkLCvZZygYYttzgYbFko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
