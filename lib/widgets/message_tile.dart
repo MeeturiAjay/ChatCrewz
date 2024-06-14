@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class MessageTile extends StatefulWidget {
@@ -58,7 +60,7 @@ class _MessageTileState extends State<MessageTile> {
               widget.sentByMe ? "YOU" : widget.sender.toUpperCase(),
               textAlign: widget.sentByMe ? TextAlign.end : TextAlign.start,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
                 letterSpacing: -0.5,

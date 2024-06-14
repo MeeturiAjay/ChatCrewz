@@ -34,11 +34,18 @@ class _ChatPageState extends State<ChatPage> {
     scrollToBottom();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   getChatandAdmin() {
     DatabaseService().getChats(widget.groupId).then((val) {
       setState(() {
         chats = val;
       });
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
     });
     DatabaseService().getGroupAdmin(widget.groupId).then((val) {
       setState(() {
@@ -49,11 +56,13 @@ class _ChatPageState extends State<ChatPage> {
 
   void scrollToBottom() {
     Future.delayed(Duration(milliseconds: 300), () {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.linearToEaseOut,
+        );
+      }
     });
   }
 
@@ -65,10 +74,8 @@ class _ChatPageState extends State<ChatPage> {
         centerTitle: true,
         elevation: 0,
         title: Text(
-            widget.groupName,
-        style: TextStyle(
-          fontSize: 21,
-            fontWeight: FontWeight.bold),
+          widget.groupName,
+          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
@@ -140,30 +147,34 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  chatMessages() {
+  Widget chatMessages() {
     return StreamBuilder(
       stream: chats,
-      builder: (context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData) {
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text("No messages yet"));
+        } else {
+          WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
           return ListView.builder(
             controller: _scrollController,
-            itemCount: snapshot.data.docs.length,
+            itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
+              final message = snapshot.data!.docs[index];
               return MessageTile(
-                message: snapshot.data.docs[index]['message'],
-                sender: snapshot.data.docs[index]['sender'],
-                sentByMe: widget.userName == snapshot.data.docs[index]['sender'],
+                message: message['message'],
+                sender: message['sender'],
+                sentByMe: widget.userName == message['sender'],
               );
             },
           );
-        } else {
-          return Container();
         }
       },
     );
   }
 
-  sendMessage() {
+  void sendMessage() {
     if (messageController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text,
@@ -173,11 +184,7 @@ class _ChatPageState extends State<ChatPage> {
 
       DatabaseService().sendMessage(widget.groupId, chatMessageMap);
 
-      // Clear the text field
       messageController.clear();
-
-      // Scroll to the bottom of the list view after sending a message
-      scrollToBottom();
     }
   }
 }
