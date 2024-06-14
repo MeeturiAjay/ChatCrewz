@@ -16,9 +16,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchController = TextEditingController();
-  bool isLoading = false;
   QuerySnapshot? searchSnapshot;
-  bool hasUserSearched = false;
   String userName = "";
   bool isJoined = false;
   User? user;
@@ -27,6 +25,9 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     getCurrentUserIdandName();
+    searchController.addListener(() {
+      initiateSearchMethod(searchController.text);
+    });
   }
 
   getCurrentUserIdandName() async {
@@ -44,6 +45,120 @@ class _SearchPageState extends State<SearchPage> {
 
   String getId(String res) {
     return res.substring(0, res.indexOf("_"));
+  }
+
+  initiateSearchMethod(String query) async {
+    if (query.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .where('groupName', isGreaterThanOrEqualTo: query)
+          .where('groupName', isLessThanOrEqualTo: query + '\uf8ff')
+          .get()
+          .then((snapshot) {
+        setState(() {
+          searchSnapshot = snapshot;
+        });
+      });
+    } else {
+      setState(() {
+        searchSnapshot = null;
+      });
+    }
+  }
+
+  Widget groupList() {
+    if (searchSnapshot == null) {
+      return Container();
+    }
+    if (searchSnapshot!.docs.isEmpty) {
+      return Center(child: Text("No groups found"));
+    }
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: searchSnapshot!.docs.length,
+      itemBuilder: (context, index) {
+        return groupTile(
+          userName,
+          searchSnapshot!.docs[index]['groupId'],
+          searchSnapshot!.docs[index]['groupName'],
+          searchSnapshot!.docs[index]['admin'],
+        );
+      },
+    );
+  }
+
+  joinedOrNot(String userName, String groupId, String groupName, String admin) async {
+    await DatabaseService(uid: user!.uid)
+        .isUserJoined(groupName, groupId, userName)
+        .then((value) {
+      setState(() {
+        isJoined = value;
+      });
+    });
+  }
+
+  Widget groupTile(String userName, String groupId, String groupName, String admin) {
+    // function to check whether user already exists in group
+    joinedOrNot(userName, groupId, groupName, admin);
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      leading: CircleAvatar(
+        radius: 30,
+        backgroundColor: Theme.of(context).primaryColor,
+        child: Text(
+          groupName.substring(0, 1).toUpperCase(),
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      title: Text(groupName, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text("Admin: ${getName(admin)}"),
+      trailing: InkWell(
+        onTap: () async {
+          await DatabaseService(uid: user!.uid)
+              .toggleGroupJoin(groupId, userName, groupName);
+          if (isJoined) {
+            setState(() {
+              isJoined = !isJoined;
+            });
+            showSnackbar(context, Colors.green, "Successfully joined the group");
+            Future.delayed(const Duration(seconds: 2), () {
+              nextScreen(
+                  context,
+                  ChatPage(
+                      groupId: groupId,
+                      groupName: groupName,
+                      userName: userName));
+            });
+          } else {
+            setState(() {
+              isJoined = !isJoined;
+              showSnackbar(context, Colors.red, "Left the group $groupName");
+            });
+          }
+        },
+        child: isJoined
+            ? Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.black,
+            border: Border.all(color: Colors.white, width: 1),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: const Text(
+            "Joined",
+            style: TextStyle(color: Colors.white),
+          ),
+        )
+            : Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Theme.of(context).primaryColor,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: const Text("Join Now", style: TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
   }
 
   @override
@@ -73,13 +188,12 @@ class _SearchPageState extends State<SearchPage> {
                     decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Search groups....",
-                        hintStyle:
-                        TextStyle(color: Colors.white, fontSize: 16)),
+                        hintStyle: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),
                 GestureDetector(
                   onTap: () {
-                    initiateSearchMethod();
+                    initiateSearchMethod(searchController.text);
                   },
                   child: Container(
                     width: 40,
@@ -96,127 +210,8 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
           ),
-          isLoading
-              ? Center(
-            child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor),
-          )
-              : groupList(),
+          Expanded(child: groupList()),
         ],
-      ),
-    );
-  }
-
-  initiateSearchMethod() async {
-    if (searchController.text.isNotEmpty) {
-      setState(() {
-        isLoading = true;
-      });
-      await DatabaseService()
-          .searchByName(searchController.text)
-          .then((snapshot) {
-        setState(() {
-          searchSnapshot = snapshot;
-          isLoading = false;
-          hasUserSearched = true;
-        });
-      });
-    }
-  }
-
-  groupList() {
-    return hasUserSearched
-        ? ListView.builder(
-      shrinkWrap: true,
-      itemCount: searchSnapshot!.docs.length,
-      itemBuilder: (context, index) {
-        return groupTile(
-          userName,
-          searchSnapshot!.docs[index]['groupId'],
-          searchSnapshot!.docs[index]['groupName'],
-          searchSnapshot!.docs[index]['admin'],
-        );
-      },
-    )
-        : Container();
-  }
-
-  joinedOrNot(
-      String userName, String groupId, String groupname, String admin) async {
-    await DatabaseService(uid: user!.uid)
-        .isUserJoined(groupname, groupId, userName)
-        .then((value) {
-      setState(() {
-        isJoined = value;
-      });
-    });
-  }
-
-  Widget groupTile(
-      String userName, String groupId, String groupName, String admin) {
-    // function to check whether user already exists in group
-    joinedOrNot(userName, groupId, groupName, admin);
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      leading: CircleAvatar(
-        radius: 30,
-        backgroundColor: Theme.of(context).primaryColor,
-        child: Text(
-          groupName.substring(0, 1).toUpperCase(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      title:
-      Text(groupName, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text("Admin: ${getName(admin)}"),
-      trailing: InkWell(
-        onTap: () async {
-          await DatabaseService(uid: user!.uid)
-              .toggleGroupJoin(groupId, userName, groupName);
-          if (isJoined) {
-            setState(() {
-              isJoined = !isJoined;
-            });
-            showSnackbar(context, Colors.green, "Successfully joined he group");
-            Future.delayed(const Duration(seconds: 2), () {
-              nextScreen(
-                  context,
-                  ChatPage(
-                      groupId: groupId,
-                      groupName: groupName,
-                      userName: userName));
-            });
-          } else {
-            setState(() {
-              isJoined = !isJoined;
-              showSnackbar(context, Colors.red, "Left the group $groupName");
-            });
-          }
-        },
-        child: isJoined
-            ? Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.black,
-            border: Border.all(color: Colors.white, width: 1),
-          ),
-          padding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: const Text(
-            "Joined",
-            style: TextStyle(color: Colors.white),
-          ),
-        )
-            : Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).primaryColor,
-          ),
-          padding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: const Text("Join Now",
-              style: TextStyle(color: Colors.white)),
-        ),
       ),
     );
   }
