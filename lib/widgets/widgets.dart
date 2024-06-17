@@ -1,15 +1,16 @@
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 const textInputDecoration = InputDecoration(
   labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
   focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Color(0xFFee7b64), width: 2),
+    borderSide: BorderSide(color: Colors.white, width: 2),
   ),
   enabledBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Color(0xFFee7b64), width: 2),
+    borderSide: BorderSide(color: Colors.white, width: 2),
   ),
   errorBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Color(0xFFee7b64), width: 2),
+    borderSide: BorderSide(color: Colors.white, width: 2),
   ),
 );
 
@@ -27,12 +28,13 @@ void showSnackbar(context, color, message) {
     SnackBar(
       content: Text(
         message,
-        style: const TextStyle(fontSize: 14),
+        style:  TextStyle(fontSize: 14, color: AppColors.bgcolor),
       ),
       backgroundColor: color,
       duration: const Duration(seconds: 2),
       action: SnackBarAction(
         label: "OK",
+        backgroundColor: AppColors.bgcolor,
         onPressed: () {},
         textColor: Colors.white,
       ),
