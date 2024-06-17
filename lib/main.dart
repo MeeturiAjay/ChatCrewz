@@ -1,17 +1,18 @@
+import 'dart:async';
+
+import 'package:firebasechatapplatest/pages/introscreens/splashscreen.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebasechatapplatest/firebase_options.dart';
-import 'package:firebasechatapplatest/pages/auth/login_page.dart';
-import 'package:firebasechatapplatest/pages/home_page.dart';
 import 'package:firebasechatapplatest/shared/constants.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-import 'helper/helper_function.dart';
+import 'helper/helper_function.dart';  // Import Lottie package
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
+    options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());
 }
@@ -46,10 +47,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          primaryColor: Constants().primaryColor,
-          scaffoldBackgroundColor: Colors.white),
+        primaryColor: Constants().primaryColor,
+        scaffoldBackgroundColor: Colors.white,
+      ),
       debugShowCheckedModeBanner: false,
-      home: _isSignedIn ? const HomePage() : const LoginPage(),
+      home: SplashScreen(),  // Use SplashScreen as the initial route
     );
   }
 }

@@ -5,6 +5,7 @@ class HelperFunctions {
   static String userLoggedInKey = "LOGGEDINKEY";
   static String userNameKey = "USERNAMEKEY";
   static String userEmailKey = "USEREMAILKEY";
+  // static String userRegisterInKey = "REGISTEREDINKEY";
 
   // saving the data to SF
 
@@ -29,6 +30,7 @@ class HelperFunctions {
     SharedPreferences sf = await SharedPreferences.getInstance();
     return sf.getBool(userLoggedInKey);
   }
+
 
   static Future<String?> getUserEmailFromSF() async {
     SharedPreferences sf = await SharedPreferences.getInstance();
