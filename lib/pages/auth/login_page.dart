@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../helper/helper_function.dart';
 import '../../service/auth_service.dart';
@@ -26,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.bgcolor,
       body: _isLoading
           ? Center(
         child: CircularProgressIndicator(
@@ -42,21 +45,29 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    "Groupie",
+                    "ChatCrewz",
                     style: TextStyle(
-                        fontSize: 40, fontWeight: FontWeight.bold),
+                        fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  const SizedBox(height: 10),
-                  const Text("Login now to see what they are talking!",
+                  const SizedBox(height: 3),
+                  const Text("Instantly connect and collaborate with friends, family, and colleagues in real time.",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w400)),
-                  Image.asset("assets/images/login.png"),
+                          fontSize: 15, fontWeight: FontWeight.w400, color: Colors.white)),
+                  const SizedBox(height: 20),
+                  Lottie.asset("assets/animations/login.json", width: 360, height: 260),
+                  const SizedBox(height: 25),
                   TextFormField(
+                    style: TextStyle(
+                      color: Colors.white
+                    ),
+                    cursorColor: Colors.white,
                     decoration: textInputDecoration.copyWith(
                         labelText: "Email",
+                        labelStyle: TextStyle(color: Colors.white),
                         prefixIcon: Icon(
                           Icons.email,
-                          color: Theme.of(context).primaryColor,
+                          color: Colors.white,
                         )),
                     onChanged: (val) {
                       setState(() {
@@ -75,12 +86,17 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 15),
                   TextFormField(
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                    cursorColor: Colors.white,
                     obscureText: true,
                     decoration: textInputDecoration.copyWith(
                         labelText: "Password",
+                        labelStyle: TextStyle(color: Colors.white),
                         prefixIcon: Icon(
                           Icons.lock,
-                          color: Theme.of(context).primaryColor,
+                          color: Colors.white,
                         )),
                     validator: (val) {
                       if (val!.length < 6) {
@@ -102,14 +118,14 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColor,
+                          backgroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       child: const Text(
                         "Sign In",
                         style:
-                        TextStyle(color: Colors.white, fontSize: 16),
+                        TextStyle(color: Colors.blue, fontSize: 16),
                       ),
                       onPressed: () {
                         login();
@@ -122,13 +138,13 @@ class _LoginPageState extends State<LoginPage> {
                   Text.rich(TextSpan(
                     text: "Don't have an account? ",
                     style: const TextStyle(
-                        color: Colors.black, fontSize: 14),
+                        color: Colors.white, fontSize: 14),
                     children: <TextSpan>[
                       TextSpan(
                           text: "Register here",
                           style: const TextStyle(
-                              color: Colors.black,
-                              decoration: TextDecoration.underline),
+                              color: Colors.white,
+                          fontWeight: FontWeight.bold),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               nextScreen(context, const RegisterPage());
