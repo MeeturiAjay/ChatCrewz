@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebasechatapplatest/pages/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebasechatapplatest/pages/Onboarding_screens.dart';
 import 'package:lottie/lottie.dart'; // Import Lottie package
@@ -15,11 +16,11 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(
-      Duration(seconds: 3),  // Change the duration as needed
+      Duration(seconds: 5),  // Change the duration as needed
           () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) =>  OnBoardingScreens(),
+            builder: (_) =>  LoginPage(),
           ),
         );
       },

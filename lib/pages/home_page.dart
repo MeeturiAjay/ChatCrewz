@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasechatapplatest/pages/introscreens/splashscreen.dart';
 import 'package:firebasechatapplatest/pages/profile_page.dart';
 import 'package:firebasechatapplatest/pages/search_page.dart';
 import 'package:firebasechatapplatest/shared/app_colors.dart';
@@ -73,9 +74,17 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 nextScreen(context, const SearchPage());
               },
-              icon: const Icon(
-                Icons.search,
-              ))
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(40)),
+                child: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+              ),)
         ],
         elevation: 0,
         centerTitle: true,
@@ -88,102 +97,113 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: Drawer(
           child: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 50),
-        children: <Widget>[
-          Icon(
-            Icons.account_circle,
-            size: 150,
-            color: Colors.grey[700],
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Text(
-            userName,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          // const Divider(
-          //   height: 2,
-          // ),
-          ListTile(
-            onTap: () {},
-            selectedColor: AppColors.bgcolor,
-            selected: true,
-            contentPadding:
+            padding: const EdgeInsets.symmetric(vertical: 50),
+            children: <Widget>[
+              Icon(
+                Icons.account_circle,
+                size: 150,
+                color: Colors.grey[700],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Text(
+                userName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              // const Divider(
+              //   height: 2,
+              // ),
+              ListTile(
+                onTap: () {},
+                selectedColor: AppColors.bgcolor,
+                selected: true,
+                contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.group),
-            title: const Text(
-              "Groups",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          ListTile(
-            onTap: () {
-              nextScreenReplace(
-                  context,
-                  ProfilePage(
-                    userName: userName,
-                    email: email,
-                  ));
-            },
-            contentPadding:
+                leading: const Icon(Icons.group),
+                title: const Text(
+                  "Groups",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  nextScreenReplace(
+                      context,
+                      ProfilePage(
+                        userName: userName,
+                        email: email,
+                      ));
+                },
+                contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.group),
-            title: const Text(
-              "Profile",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          ListTile(
-            onTap: () async {
-              showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text("Logout"),
-                      content: const Text("Are you sure you want to logout?"),
-                      actions: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(
-                            Icons.cancel,
-                            color: Colors.red,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            await authService.signOut();
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false);
-                          },
-                          icon: const Icon(
-                            Icons.done,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    );
-                  });
-            },
-            contentPadding:
+                leading: const Icon(Icons.group),
+                title: const Text(
+                  "Profile",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              ListTile(
+                onTap: () async {
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Logout"),
+                          content: const Text("Are you sure you want to logout?"),
+                          actions: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                Navigator.pop(context); // Close the dialog
+
+                                // Show the splash screen
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const SplashScreen(),
+                                ));
+
+                                // Wait for 2 seconds (you can adjust this duration)
+                                await Future.delayed(Duration(seconds: 2));
+
+                                await authService.signOut();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => const LoginPage()),
+                                      (route) => false,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.done,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        );
+                      });
+                },
+                contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.exit_to_app),
-            title: const Text(
-              "Logout",
-              style: TextStyle(color: Colors.black),
-            ),
-          )
-        ],
-      )),
+                leading: const Icon(Icons.exit_to_app),
+                title: const Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.black),
+                ),
+              )
+            ],
+          )),
       body: groupList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -216,31 +236,29 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _isLoading == true
                       ? Center(
-                          child: CircularProgressIndicator(
-                              color: Theme.of(context).primaryColor),
-                        )
+                    child: CircularProgressIndicator(
+                        color: Theme.of(context).primaryColor),
+                  )
                       : TextField(
-                          onChanged: (val) {
-                            setState(() {
-                              groupName = val;
-                            });
-                          },
-                          style: const TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                            hintText: "Enter the group name",
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.blue),
-                                  borderRadius: BorderRadius.circular(20)),
-                              errorBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.blue),
-                                  borderRadius: BorderRadius.circular(20)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.blue),
-                                  borderRadius: BorderRadius.circular(20))),
-                        ),
+                    onChanged: (val) {
+                      setState(() {
+                        groupName = val;
+                      });
+                    },
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                      hintText: "Enter the group name",
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(20)),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(20)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                  ),
                 ],
               ),
               actions: [
@@ -262,9 +280,9 @@ class _HomePageState extends State<HomePage> {
                         _isLoading = true;
                       });
                       DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
+                          uid: FirebaseAuth.instance.currentUser!.uid)
                           .createGroup(userName,
-                              FirebaseAuth.instance.currentUser!.uid, groupName)
+                          FirebaseAuth.instance.currentUser!.uid, groupName)
                           .whenComplete(() {
                         _isLoading = false;
                       });
@@ -299,9 +317,9 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (context, index) {
                   int reverseIndex = snapshot.data['groups'].length - index - 1;
                   return GroupTile(
-                      groupId: getId(snapshot.data['groups'][reverseIndex]),
-                      groupName: getName(snapshot.data['groups'][reverseIndex]),
-                      userName: snapshot.data['fullName'],
+                    groupId: getId(snapshot.data['groups'][reverseIndex]),
+                    groupName: getName(snapshot.data['groups'][reverseIndex]),
+                    userName: snapshot.data['fullName'],
                   );
                 },
               );

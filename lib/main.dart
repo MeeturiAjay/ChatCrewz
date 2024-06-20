@@ -1,17 +1,13 @@
-import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:firebasechatapplatest/pages/Onboarding_screens.dart';
 import 'package:firebasechatapplatest/pages/auth/login_page.dart';
 import 'package:firebasechatapplatest/pages/home_page.dart';
-import 'package:firebasechatapplatest/pages/introscreens/splashscreen.dart';
-import 'package:firebasechatapplatest/pages/register_page.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebasechatapplatest/firebase_options.dart';
 import 'package:firebasechatapplatest/shared/constants.dart';
-import 'package:flutter/foundation.dart';
-
-import 'helper/helper_function.dart';  // Import Lottie package
+import 'helper/helper_function.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,32 +26,71 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isSignedIn = false;
+  bool _showOnboarding = false;
+  bool _isLoading = true; // Add this to manage loading state
 
   @override
   void initState() {
     super.initState();
-    getUserLoggedInStatus();
+    initializeApp();
   }
 
-  getUserLoggedInStatus() async {
-    await HelperFunctions.getUserLoggedInStatus().then((value) {
-      if (value != null) {
-        setState(() {
-          _isSignedIn = value;
-        });
-      }
+  Future<void> initializeApp() async {
+    await checkFirstRun();
+    await getUserLoggedInStatus();
+    setState(() {
+      _isLoading = false; // Set loading to false once all checks are done
     });
+  }
+
+  Future<void> checkFirstRun() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? isFirstRun = prefs.getBool('isFirstRun');
+
+    if (isFirstRun == null || isFirstRun == true) {
+      setState(() {
+        _showOnboarding = true;
+      });
+      prefs.setBool('isFirstRun', false);
+    }
+  }
+
+  Future<void> getUserLoggedInStatus() async {
+    bool? isLoggedIn = await HelperFunctions.getUserLoggedInStatus();
+    if (isLoggedIn != null) {
+      setState(() {
+        _isSignedIn = isLoggedIn;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return MaterialApp(
+        theme: ThemeData(
+          primaryColor: Constants().primaryColor,
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Constants().primaryColor,
         scaffoldBackgroundColor: Colors.white,
       ),
       debugShowCheckedModeBanner: false,
-      home: _isSignedIn ? const HomePage() : const LoginPage(),  // Use SplashScreen as the initial route
+      home: _showOnboarding
+          ? const OnBoardingScreens()
+          : _isSignedIn
+          ? const HomePage()
+          : const LoginPage(),
     );
   }
 }
