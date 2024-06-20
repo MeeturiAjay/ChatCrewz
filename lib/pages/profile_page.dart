@@ -1,3 +1,4 @@
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../service/auth_service.dart';
@@ -22,9 +23,10 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.bgcolor,
         elevation: 0,
         title: const Text(
+          textAlign: TextAlign.center,
           "Profile",
           style: TextStyle(
               color: Colors.white, fontSize: 27, fontWeight: FontWeight.bold),

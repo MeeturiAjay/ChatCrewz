@@ -31,7 +31,7 @@ void showSnackbar(context, color, message) {
         style:  TextStyle(fontSize: 14, color: AppColors.bgcolor),
       ),
       backgroundColor: color,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
       action: SnackBarAction(
         label: "OK",
         backgroundColor: AppColors.bgcolor,

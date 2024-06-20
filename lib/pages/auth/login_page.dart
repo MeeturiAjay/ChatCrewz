@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasechatapplatest/pages/introscreens/splashscreen.dart';
 import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: AppColors.bgcolor,
       body: _isLoading
           ? Center(
-        child: CircularProgressIndicator(
-            color: Theme.of(context).primaryColor),
+        child: SplashScreen(),
       )
           : SingleChildScrollView(
         child: Padding(

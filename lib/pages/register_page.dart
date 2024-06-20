@@ -1,3 +1,4 @@
+import 'package:firebasechatapplatest/pages/introscreens/splashscreen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -30,7 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
       backgroundColor: AppColors.bgcolor,
       body: _isLoading
           ? Center(
-        child: CircularProgressIndicator(color: AppColors.bgcolor),
+        child: SplashScreen(),
       )
           : SingleChildScrollView(
         child: Padding(
