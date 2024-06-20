@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../service/database_service.dart';
@@ -77,7 +78,7 @@ class _ChatPageState extends State<ChatPage> {
           widget.groupName,
           style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.bgcolor,
         actions: [
           IconButton(
             onPressed: () {
@@ -128,7 +129,7 @@ class _ChatPageState extends State<ChatPage> {
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: AppColors.bgcolor,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: const Center(

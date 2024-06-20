@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasechatapplatest/pages/profile_page.dart';
 import 'package:firebasechatapplatest/pages/search_page.dart';
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/helper_function.dart';
@@ -78,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         ],
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.bgcolor,
         title: const Text(
           "Crewz",
           style: TextStyle(
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> {
           // ),
           ListTile(
             onTap: () {},
-            selectedColor: Theme.of(context).primaryColor,
+            selectedColor: AppColors.bgcolor,
             selected: true,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -189,7 +190,7 @@ class _HomePageState extends State<HomePage> {
           popUpDialog(context);
         },
         elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.bgcolor,
         child: const Icon(
           Icons.add,
           color: Colors.white,
@@ -229,15 +230,15 @@ class _HomePageState extends State<HomePage> {
                             hintText: "Enter the group name",
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Theme.of(context).primaryColor),
+                                      color: Colors.blue),
                                   borderRadius: BorderRadius.circular(20)),
                               errorBorder: OutlineInputBorder(
                                   borderSide:
-                                      const BorderSide(color: Colors.red),
+                                      const BorderSide(color: Colors.blue),
                                   borderRadius: BorderRadius.circular(20)),
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Theme.of(context).primaryColor),
+                                      color: Colors.blue),
                                   borderRadius: BorderRadius.circular(20))),
                         ),
                 ],
@@ -248,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor),
+                      backgroundColor: AppColors.bgcolor),
                   child: const Text(
                     "CANCEL",
                     style: TextStyle(color: Colors.white),
@@ -273,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor),
+                      backgroundColor: AppColors.bgcolor),
                   child: const Text(
                     "CREATE",
                     style: TextStyle(color: Colors.white),

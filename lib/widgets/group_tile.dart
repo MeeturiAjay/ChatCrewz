@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/widgets.dart';
@@ -66,7 +67,7 @@ class _GroupTileState extends State<GroupTile> {
         child: ListTile(
           leading: CircleAvatar(
             radius: 30,
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: AppColors.bgcolor,
             child: Text(
               widget.groupName.substring(0, 1).toUpperCase(),
               textAlign: TextAlign.center,

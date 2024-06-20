@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class MessageTile extends StatefulWidget {
@@ -48,7 +49,7 @@ class _MessageTileState extends State<MessageTile> {
             bottomRight: widget.sentByMe ? Radius.zero : Radius.circular(20),
           ),
           color: widget.sentByMe
-              ? Theme.of(context).primaryColor
+              ? AppColors.bgcolor
               : Colors.grey[700],
         ),
         child: Column(

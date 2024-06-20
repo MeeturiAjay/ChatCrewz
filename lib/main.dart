@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Colors.white,
       ),
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),  // Use SplashScreen as the initial route
+      home: HomePage(),  // Use SplashScreen as the initial route
     );
   }
 }

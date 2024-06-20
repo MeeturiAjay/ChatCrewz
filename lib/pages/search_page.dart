@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/helper_function.dart';
@@ -104,7 +105,7 @@ class _SearchPageState extends State<SearchPage> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       leading: CircleAvatar(
         radius: 30,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.bgcolor,
         child: Text(
           groupName.substring(0, 1).toUpperCase(),
           style: const TextStyle(color: Colors.white),
@@ -140,7 +141,7 @@ class _SearchPageState extends State<SearchPage> {
             ? Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Colors.black,
+            color: AppColors.bgcolor,
             border: Border.all(color: Colors.white, width: 1),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -152,7 +153,7 @@ class _SearchPageState extends State<SearchPage> {
             : Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).primaryColor,
+            color: AppColors.bgcolor,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: const Text("Join Now", style: TextStyle(color: Colors.white)),
@@ -167,7 +168,7 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.bgcolor,
         title: const Text(
           "Search",
           style: TextStyle(
@@ -177,7 +178,7 @@ class _SearchPageState extends State<SearchPage> {
       body: Column(
         children: [
           Container(
-            color: Theme.of(context).primaryColor,
+            color: AppColors.bgcolor,
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Row(
               children: [
