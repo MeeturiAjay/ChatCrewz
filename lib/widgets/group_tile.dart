@@ -1,15 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
-
-import '../widgets/widgets.dart';
 import '../pages/chat_page.dart';
+import '../widgets/widgets.dart'; // Import your custom widgets if any
+import '../shared/app_colors.dart'; // Assuming you have a file for app colors
 
 class GroupTile extends StatefulWidget {
   final String userName;
   final String groupId;
   final String groupName;
+
   const GroupTile({
     Key? key,
     required this.groupId,
@@ -64,10 +63,14 @@ class _GroupTileState extends State<GroupTile> {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          color: Colors.blue.withOpacity(0.2),
+        ),
         child: ListTile(
           leading: CircleAvatar(
             radius: 30,
-            backgroundColor: AppColors.bgcolor,
+            backgroundColor: Colors.lightBlue[700], // Set background color here
             child: Text(
               widget.groupName.substring(0, 1).toUpperCase(),
               textAlign: TextAlign.center,
@@ -96,3 +99,4 @@ class _GroupTileState extends State<GroupTile> {
     return r.substring(r.indexOf("_") + 1);
   }
 }
+
