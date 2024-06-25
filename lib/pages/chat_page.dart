@@ -1,17 +1,21 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebasechatapplatest/pages/introscreens/splashscreen.dart';
-import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../service/database_service.dart';
+import '../shared/app_colors.dart';
 import '../widgets/message_tile.dart';
 import '../widgets/widgets.dart';
 import 'group_info.dart';
+import 'introscreens/splashscreen.dart';
 
 class ChatPage extends StatefulWidget {
   final String groupId;
   final String groupName;
   final String userName;
+
   const ChatPage({
     Key? key,
     required this.groupId,
@@ -33,7 +37,6 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     getChatandAdmin();
-    scrollToBottom();
   }
 
   @override
@@ -42,12 +45,12 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  getChatandAdmin() {
+  void getChatandAdmin() {
     DatabaseService().getChats(widget.groupId).then((val) {
       setState(() {
         chats = val;
       });
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+      WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
     });
     DatabaseService().getGroupAdmin(widget.groupId).then((val) {
       setState(() {
@@ -57,15 +60,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void scrollToBottom() {
-    Future.delayed(Duration(milliseconds: 300), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.linearToEaseOut,
-        );
-      }
-    });
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.linearToEaseOut,
+      );
+    }
   }
 
   @override
@@ -103,43 +104,46 @@ class _ChatPageState extends State<ChatPage> {
             child: chatMessages(),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            color: Colors.grey[700],
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            color: Colors.blue, //Colors.grey[700],
             child: Row(
               children: [
                 Expanded(
-                  child: TextFormField(
-                    cursorColor: Colors.white,
-                    controller: messageController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      hintText: "Send a message...",
-                      hintStyle: TextStyle(color: Colors.white, fontSize: 16),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    sendMessage();
-                  },
                   child: Container(
-                    height: 50,
-                    width: 50,
                     decoration: BoxDecoration(
-                      color: AppColors.bgcolor,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.image),
+                          onPressed: () {
+                            getImageFromGallery(); // Function to handle image selection
+                          },
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            cursorColor: Colors.black,
+                            controller: messageController,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              hintText: "Message ChatCrewZ",
+                              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 16),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    sendMessage();
+                  },
+                  icon: Icon(Icons.send, color: Colors.white, size: 30,),
                 ),
               ],
             ),
@@ -159,15 +163,42 @@ class _ChatPageState extends State<ChatPage> {
           return Center(child: Text("No messages yet"));
         } else {
           WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
+
+          // Group messages by date
+          final messagesByDate = _groupMessagesByDate(snapshot.data!.docs);
+
           return ListView.builder(
             controller: _scrollController,
-            itemCount: snapshot.data!.docs.length,
+            itemCount: messagesByDate.length,
             itemBuilder: (context, index) {
-              final message = snapshot.data!.docs[index];
-              return MessageTile(
-                message: message['message'],
-                sender: message['sender'],
-                sentByMe: widget.userName == message['sender'],
+              final date = messagesByDate.keys.elementAt(index);
+              final messages = messagesByDate[date]!;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    alignment: Alignment.center,
+                    child: Text(
+                      _formatDate(date),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  ...messages.map((message) {
+                    final timestamp = DateTime.fromMillisecondsSinceEpoch(message['time']);
+                    return MessageTile(
+                      message: message['message'],
+                      sender: message['sender'],
+                      sentByMe: widget.userName == message['sender'],
+                      timestamp: timestamp,
+                    );
+                  }).toList(),
+                ],
               );
             },
           );
@@ -176,12 +207,44 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  Map<DateTime, List<QueryDocumentSnapshot>> _groupMessagesByDate(List<QueryDocumentSnapshot> docs) {
+    final messagesByDate = <DateTime, List<QueryDocumentSnapshot>>{};
+
+    for (var doc in docs) {
+      final timestamp = DateTime.fromMillisecondsSinceEpoch(doc['time']);
+      final date = DateTime(timestamp.year, timestamp.month, timestamp.day);
+
+      if (!messagesByDate.containsKey(date)) {
+        messagesByDate[date] = [];
+      }
+
+      messagesByDate[date]!.add(doc);
+    }
+
+    return messagesByDate;
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(Duration(days: 1));
+
+    if (date == today) {
+      return "Today";
+    } else if (date == yesterday) {
+      return "Yesterday";
+    } else {
+      return "${date.day}/${date.month}/${date.year}";
+    }
+  }
+
   void sendMessage() {
     if (messageController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageMap = {
         "message": messageController.text,
         "sender": widget.userName,
         "time": DateTime.now().millisecondsSinceEpoch,
+        "type": "text", // Add a type field to distinguish text messages
       };
 
       DatabaseService().sendMessage(widget.groupId, chatMessageMap);
@@ -189,4 +252,32 @@ class _ChatPageState extends State<ChatPage> {
       messageController.clear();
     }
   }
+
+  Future<void> getImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      // Read the file and convert it to bytes
+      File imageFile = File(pickedFile.path);
+      List<int> imageBytes = await imageFile.readAsBytes();
+
+      sendMessageImage(imageBytes); // Send the image bytes as a message
+    } else {
+      // User canceled the picker
+    }
+  }
+
+  void sendMessageImage(List<int> imageBytes) {
+    // Assuming 'message' field in Firestore can store bytes directly
+    Map<String, dynamic> chatMessageMap = {
+      "message": imageBytes,
+      "sender": widget.userName,
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "type": "image", // Add a type field to distinguish image messages
+    };
+
+    DatabaseService().sendMessage(widget.groupId, chatMessageMap);
+  }
 }
+
