@@ -68,6 +68,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return MaterialApp(
+        // title: "ChatCrewZ",
         theme: ThemeData(
           primaryColor: Constants().primaryColor,
           scaffoldBackgroundColor: Colors.white,
