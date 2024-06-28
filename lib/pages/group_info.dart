@@ -29,15 +29,14 @@ class _GroupInfoState extends State<GroupInfo> {
     super.initState();
   }
 
-  getMembers() async {
-    DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getGroupMembers(widget.groupId)
-        .then((val) {
-      setState(() {
-        members = val;
-      });
+  void getMembers() async {
+    var val = await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getGroupMembers(widget.groupId);
+    setState(() {
+      members = val;
     });
   }
+
 
   String getName(String r) {
     return r.substring(r.indexOf("_") + 1);

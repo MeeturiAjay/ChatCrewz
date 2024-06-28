@@ -44,25 +44,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   gettingUserData() async {
-    await HelperFunctions.getUserEmailFromSF().then((value) {
-      setState(() {
-        email = value!;
-      });
+    email = (await HelperFunctions.getUserEmailFromSF())!;
+    userName = (await HelperFunctions.getUserNameFromSF())!;
+
+    setState(() {
+      email = email!;
+      userName = userName!;
     });
-    await HelperFunctions.getUserNameFromSF().then((val) {
-      setState(() {
-        userName = val!;
-      });
-    });
-    // getting the list of snapshots in our stream
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getUserGroups()
-        .then((snapshot) {
-      setState(() {
-        groups = snapshot;
-      });
+
+    // Getting the list of snapshots in our stream
+    var snapshot = await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUserGroups();
+
+    setState(() {
+      groups = snapshot;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

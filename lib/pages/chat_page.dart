@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../service/database_service.dart';
 import '../shared/app_colors.dart';
@@ -32,6 +32,7 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController messageController = TextEditingController();
   String admin = "";
   final ScrollController _scrollController = ScrollController();
+  List<String> selectedMessageIds = [];
 
   @override
   void initState() {
@@ -45,17 +46,18 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  void getChatandAdmin() {
-    DatabaseService().getChats(widget.groupId).then((val) {
-      setState(() {
-        chats = val;
-      });
-      WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
+  void getChatandAdmin() async {
+    // Fetch chats
+    var val = await DatabaseService().getChats(widget.groupId);
+    setState(() {
+      chats = val;
     });
-    DatabaseService().getGroupAdmin(widget.groupId).then((val) {
-      setState(() {
-        admin = val;
-      });
+    WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
+
+    // Fetch group admin
+    var valAdmin = await DatabaseService().getGroupAdmin(widget.groupId);
+    setState(() {
+      admin = valAdmin;
     });
   }
 
@@ -105,7 +107,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-            color: Colors.blue, //Colors.grey[700],
+            color: Colors.blue,
             child: Row(
               children: [
                 Expanded(
@@ -119,7 +121,7 @@ class _ChatPageState extends State<ChatPage> {
                         IconButton(
                           icon: Icon(Icons.image),
                           onPressed: () {
-                            getImageFromGallery(); // Function to handle image selection
+                            getImageFromGallery();
                           },
                         ),
                         Expanded(
@@ -149,6 +151,16 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: selectedMessageIds.isEmpty
+          ? null
+          : FloatingActionButton.extended(
+        onPressed: () {
+          deleteSelectedMessages();
+        },
+        label: Text('Delete (${selectedMessageIds.length})'),
+        icon: Icon(Icons.delete),
+        backgroundColor: Colors.red,
       ),
     );
   }
@@ -190,12 +202,23 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   ...messages.map((message) {
+                    final messageId = message.id;
                     final timestamp = DateTime.fromMillisecondsSinceEpoch(message['time']);
+                    final isSelected = selectedMessageIds.contains(messageId);
+
                     return MessageTile(
                       message: message['message'],
                       sender: message['sender'],
                       sentByMe: widget.userName == message['sender'],
                       timestamp: timestamp,
+                      isSelected: isSelected,
+                      onLongPress: () {
+                        toggleMessageSelection(messageId);
+                      },
+                      onDelete: () {
+                        // Implement delete functionality here
+                        DatabaseService().deleteMessage(widget.groupId, messageId);
+                      },
                     );
                   }).toList(),
                 ],
@@ -279,5 +302,41 @@ class _ChatPageState extends State<ChatPage> {
 
     DatabaseService().sendMessage(widget.groupId, chatMessageMap);
   }
-}
 
+  void toggleMessageSelection(String messageId) {
+    setState(() {
+      if (selectedMessageIds.contains(messageId)) {
+        selectedMessageIds.remove(messageId);
+      } else {
+        selectedMessageIds.add(messageId);
+      }
+    });
+  }
+
+  void deleteSelectedMessages() {
+    // Create a batch to delete all selected messages
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    selectedMessageIds.forEach((messageId) {
+      // Reference to the document of the message to be deleted
+      DocumentReference messageRef = FirebaseFirestore.instance
+          .collection('groups')
+          .doc(widget.groupId)
+          .collection('messages')
+          .doc(messageId);
+      batch.delete(messageRef);
+    });
+
+    // Commit the batched delete operation
+    batch.commit().then((_) {
+      // Clear the selected message IDs list after successful deletion
+      setState(() {
+        selectedMessageIds.clear();
+      });
+    }).catchError((error) {
+      // Handle any errors that occur during deletion
+      print("Error deleting messages: $error");
+      // Optionally, show a snackbar or alert to the user
+    });
+  }
+}

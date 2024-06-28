@@ -1,12 +1,14 @@
-import 'dart:ui';
-import 'package:firebasechatapplatest/shared/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:firebasechatapplatest/shared/app_colors.dart';
 
-class MessageTile extends StatefulWidget {
+class MessageTile extends StatelessWidget {
   final String message;
   final String sender;
   final bool sentByMe;
   final DateTime timestamp;
+  final bool isSelected;
+  final VoidCallback onLongPress;
+  final VoidCallback onDelete;
 
   const MessageTile({
     Key? key,
@@ -14,75 +16,76 @@ class MessageTile extends StatefulWidget {
     required this.sender,
     required this.sentByMe,
     required this.timestamp,
+    required this.isSelected,
+    required this.onLongPress,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
-  State<MessageTile> createState() => _MessageTileState();
-}
-
-class _MessageTileState extends State<MessageTile> {
-  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: 4,
-        bottom: 4,
-        left: widget.sentByMe ? 0 : 24,
-        right: widget.sentByMe ? 24 : 0,
+    return Dismissible(
+      key: Key(timestamp.toString()), // Use a unique key for each message
+      direction: sentByMe ? DismissDirection.endToStart : DismissDirection.startToEnd,
+      background: Container(
+        color: Colors.red,
+        alignment: sentByMe ? Alignment.centerRight : Alignment.centerLeft,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(Icons.delete, color: Colors.white),
       ),
-      alignment: widget.sentByMe ? Alignment.centerRight : Alignment.centerLeft,
+      onDismissed: (_) => onDelete(),
       child: Container(
-        margin: widget.sentByMe
-            ? const EdgeInsets.only(left: 30)
-            : const EdgeInsets.only(right: 30),
-        padding: const EdgeInsets.only(
-          top: 10,
-          bottom: 10,
-          left: 20,
-          right: 20,
+        padding: EdgeInsets.only(
+          top: 4,
+          bottom: 4,
+          left: sentByMe ? 0 : 24,
+          right: sentByMe ? 24 : 0,
         ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-            bottomLeft: widget.sentByMe ? Radius.circular(20) : Radius.zero,
-            bottomRight: widget.sentByMe ? Radius.zero : Radius.circular(20),
+        alignment: sentByMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          margin: sentByMe ? const EdgeInsets.only(left: 30) : const EdgeInsets.only(right: 30),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+              bottomLeft: sentByMe ? Radius.circular(20) : Radius.zero,
+              bottomRight: sentByMe ? Radius.zero : Radius.circular(20),
+            ),
+            color: sentByMe ? AppColors.bgcolor : Colors.grey[700],
           ),
-          color: widget.sentByMe ? AppColors.bgcolor : Colors.grey[700],
-        ),
-        child: Column(
-          crossAxisAlignment:
-          widget.sentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.sentByMe ? "YOU" : widget.sender.toUpperCase(),
-              textAlign: widget.sentByMe ? TextAlign.end : TextAlign.start,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: -0.5,
+          child: Column(
+            crossAxisAlignment: sentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Text(
+                sentByMe ? "YOU" : sender.toUpperCase(),
+                textAlign: sentByMe ? TextAlign.end : TextAlign.start,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.message,
-              textAlign: widget.sentByMe ? TextAlign.end : TextAlign.start,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: sentByMe ? TextAlign.end : TextAlign.start,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _formatTimestamp(widget.timestamp),
-              textAlign: widget.sentByMe ? TextAlign.end : TextAlign.start,
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.white70,
+              const SizedBox(height: 8),
+              Text(
+                _formatTimestamp(timestamp),
+                textAlign: sentByMe ? TextAlign.end : TextAlign.start,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: Colors.white70,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

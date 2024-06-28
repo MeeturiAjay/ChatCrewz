@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   String password = "";
   bool _isLoading = false;
   AuthService authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,19 +48,25 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     "ChatCrewz",
                     style: TextStyle(
-                        fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white),
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   const SizedBox(height: 3),
-                  const Text("Instantly connect and collaborate with friends, family, and colleagues in real time.",
+                  const Text(
+                      "Instantly connect and collaborate with friends, family, and colleagues in real time.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w400, color: Colors.white)),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white)),
                   const SizedBox(height: 20),
-                  Lottie.asset("assets/animations/login.json", width: 360, height: 260),
+                  Lottie.asset(
+                      "assets/animations/login.json", width: 360, height: 260),
                   const SizedBox(height: 25),
                   TextFormField(
                     style: TextStyle(
-                      color: Colors.white
+                        color: Colors.white
                     ),
                     cursorColor: Colors.white,
                     decoration: textInputDecoration.copyWith(
@@ -144,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                           text: "Register here",
                           style: const TextStyle(
                               color: Colors.white,
-                          fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               nextScreen(context, const RegisterPage());
@@ -163,24 +170,31 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = true;
       });
-      await authService
-          .loginWithUserNameandPassword(email, password)
-          .then((value) async {
-        if (value == true) {
-          QuerySnapshot snapshot =
-          await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-              .gettingUserData(email);
-          // saving the values to our shared preferences
+      bool loginSuccess = await authService.loginWithUserNameandPassword(
+          email, password);
+
+      if (loginSuccess) {
+        DocumentSnapshot snapshot = await DatabaseService(
+            uid: FirebaseAuth.instance.currentUser!.uid)
+            .gettingUserData(email);
+
+        if (snapshot.exists) {
+          // Saving the values to our shared preferences
           await HelperFunctions.saveUserLoggedInStatus(true);
           await HelperFunctions.saveUserEmailSF(email);
-          await HelperFunctions.saveUserNameSF(snapshot.docs[0]['fullName']);
+          await HelperFunctions.saveUserNameSF(snapshot['fullName']);
+
+          // Navigate to the home page
           nextScreenReplace(context, const HomePage());
         } else {
-          showSnackbar(context, Colors.white, value);
-          setState(() {
-            _isLoading = false;
-          });
+          showSnackbar(context, Colors.white, "User data not found.");
         }
+      } else {
+        showSnackbar(context, Colors.white, "Login failed.");
+      }
+
+      setState(() {
+        _isLoading = false;
       });
     }
   }
