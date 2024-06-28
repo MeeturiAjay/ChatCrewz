@@ -63,10 +63,10 @@ class _GroupTileState extends State<GroupTile> {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Colors.blue.withOpacity(0.2),
-        ),
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.circular(30),
+        //   color: Colors.blue.withOpacity(0.2),
+        // ),
         child: ListTile(
           leading: CircleAvatar(
             radius: 30,
