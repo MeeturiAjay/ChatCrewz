@@ -51,6 +51,9 @@ dependencies:
   smooth_page_indicator: ^1.1.0
   lottie: ^3.1.2
   encrypt: ^5.0.3
+  another_flushbar:
+  firebase_messaging: ^14.9.4
+  flutter_local_notifications: ^17.2.0
 
 dev_dependencies:
   flutter_test:
