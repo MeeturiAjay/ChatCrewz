@@ -9,6 +9,7 @@ class IntroPage2 extends StatelessWidget {
       backgroundColor: AppColors.bgcolor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Lottie.asset('assets/animations/pg2.json'),  // Replace with your image asset
           SizedBox(height: 22),  // Add some space between image and text

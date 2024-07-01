@@ -13,7 +13,7 @@ class IntroPage3 extends StatelessWidget {
           Lottie.asset('assets/animations/pg3.json'),  // Replace with your image asset
           SizedBox(height: 12),  // Add some space between image and text
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 25),
             child: Text(
               "Experience seamless communication. Chat with friends and colleagues in real-time from anywhere.",
               textAlign: TextAlign.center,
